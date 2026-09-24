@@ -32,7 +32,7 @@ def get_device(name: str):
             return device
     raise HTTPException(status_code=404, detail="No device called " + name)
 
-# task 4: new post handler
+# task 4: new post handler;no duplicate names
 @app.post("/devices", status_code=201)
 def create_device(device: Device):
     for existing in readings:
