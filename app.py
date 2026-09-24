@@ -1,3 +1,4 @@
+from typing import Optional # task 5 attempt
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
@@ -10,6 +11,12 @@ class Device(BaseModel):
     temp: float
     online: bool
 
+# task 5 attempt
+class DeviceUpdate(BaseModel): 
+    name: Optional[str] = None
+    room: Optional[str] = None
+    temp: Optional[float] = None
+    online: Optional[bool] = None
 
 readings = [
     {"name": "front-door", "room": "hall",    "temp": 27.4, "online": True},
@@ -58,4 +65,15 @@ def delete_device(name: str):
         if device["name"] == name:
             readings.remove(device)
             return {"deleted": name}
+    raise HTTPException(status_code=404, detail="No device called " + name)
+
+
+# task 5 attempt
+@app.patch("/devices/{name}")
+def patch_device(name: str, changes: DeviceUpdate):
+    for i, existing in enumerate(readings):
+        if existing["name"] == name:
+            updates = changes.model_dump(exclude_unset=True)
+            readings[i] = {**existing, **updates}
+            return readings[i]
     raise HTTPException(status_code=404, detail="No device called " + name)
